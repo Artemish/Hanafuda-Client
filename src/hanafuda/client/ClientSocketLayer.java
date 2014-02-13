@@ -150,11 +150,20 @@ public class ClientSocketLayer {
 	static void enactFullUpdate() {
 		ClientGUI.updateStatus("Enacting Full Update.");
 		byte[] state = new byte[FULL_STATE_UPDATE_LENGTH];
-		int s1 = -1, s2 = -1;
+		byte[] userSideBoard = null, opponentSideBoard = null;
+		
 		try {
 			input.read(state, 0, FULL_STATE_UPDATE_LENGTH);
-			s1 = input.read();
-			s2 = input.read();
+			int userSideLen = input.read();
+			int opponentSideLen = input.read();
+			if (userSideLen > 0) {
+				userSideBoard = new byte[userSideLen];
+				input.read(userSideBoard, 0, userSideLen);
+			}
+			if (opponentSideLen > 0) {
+				opponentSideBoard = new byte[opponentSideLen];
+				input.read(opponentSideBoard, 0, opponentSideLen);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -174,16 +183,16 @@ public class ClientSocketLayer {
 		ClientMain.user.sideBoard.clear();
 		ClientMain.opponent.sideBoard.clear();
 		
-		for (int j = 0; j < s1; j++) {
-			ClientMain.user.sideBoard.add(
-					Card.getByID(state[FULL_STATE_UPDATE_LENGTH]));
+		if (userSideBoard != null) {
+			for (byte b : userSideBoard) ClientMain.user.sideBoard.add(
+					Card.getByID(b));
 		}
 		
-		for (int k = 0; k < s2; k++) {
-			ClientMain.opponent.sideBoard.add(
-					Card.getByID(state[FULL_STATE_UPDATE_LENGTH+s1]));
+		if (opponentSideBoard != null) {
+			for (byte b : opponentSideBoard) ClientMain.user.sideBoard.add(
+					Card.getByID(b));
 		}
-		
+				
 		ClientGUI.updateCards();
 	}
 	
