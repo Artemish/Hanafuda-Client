@@ -19,7 +19,6 @@ public class ClientMain {
 		Card.initialize();
 		Deck.initialize();
 		Board.initialize();
-		Logger.initialize("logs/");
 		
 		user = new Player();
 		opponent = new Player();
@@ -27,6 +26,9 @@ public class ClientMain {
 		
 		ClientGUI.initialize();
 		ClientGUI.updateStatus("GUI initialization complete.");
+		Logger.initialize("logs/");
+		
+
 		
 		inputThread = new Thread(new Runnable() {
 			@Override
