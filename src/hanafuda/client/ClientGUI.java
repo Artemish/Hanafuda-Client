@@ -176,6 +176,7 @@ class CardButton extends JButton implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		ClientGUI.updateStatus("Le click");
 		if (clickable) {
 			ClientMain.updateSelection(current, isBoard);
 		}

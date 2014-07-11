@@ -25,7 +25,7 @@ public class ClientSocketLayer {
 	static final byte SELECTION_MESSAGE_ID = 4;
 	static final byte STRING_MESSAGE_ID = 5;
 	
-	static final int FULL_STATE_UPDATE_LENGTH = 27;
+	static final int FULL_STATE_UPDATE_LENGTH = 32;
 	
 	private static Socket clientSocket = null;
 	private static InputStream input = null;
@@ -111,6 +111,8 @@ public class ClientSocketLayer {
 		byte[] message = {SELECTION_MESSAGE_ID, handSelection.cardID, boardSelection.cardID};
 		if (!safeWrite(message)) {
 			ClientGUI.updateStatus("Failed to send card selection.");
+		} else {
+			ClientGUI.updateStatus("Sent le selection");
 		}
 		
 	}
@@ -154,8 +156,8 @@ public class ClientSocketLayer {
 		
 		try {
 			input.read(state, 0, FULL_STATE_UPDATE_LENGTH);
-			int userSideLen = input.read();
-			int opponentSideLen = input.read();
+			int userSideLen = state[0];
+			int opponentSideLen = state[1];
 			if (userSideLen > 0) {
 				userSideBoard = new byte[userSideLen];
 				input.read(userSideBoard, 0, userSideLen);
@@ -170,14 +172,15 @@ public class ClientSocketLayer {
 		}
 		ClientGUI.updateStatus("Message recieved.");
 		
-		ClientMain.user.score = state[0];
-		ClientMain.opponent.score = state[1];
-		ClientMain.gameOver = (state[2] == 0) ? true : false;
+		ClientMain.ourTurn = (state[2] == 1) ? true : false;
+		ClientMain.user.score = state[3];
+		ClientMain.opponent.score = state[4];
+		ClientMain.gameOver = (state[5] == 1) ? true : false;
 		
-		for (int i = 3; i < 11; i++) {
-			ClientMain.user.hand[i-3] = Card.getByID(state[i]);
-			ClientMain.opponent.hand[i-3] = Card.getByID(state[i+8]);
-			Board.field[i-3] = Card.getByID(state[i+16]);
+		for (int i = 6; i < 14; i++) {
+			ClientMain.user.hand[i-6] = Card.getByID(state[i]);
+			ClientMain.opponent.hand[i-6] = Card.getByID(state[i+8]);
+			Board.field[i-6] = Card.getByID(state[i+16]);
 		}
 		
 		ClientMain.user.sideBoard.clear();

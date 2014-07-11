@@ -58,6 +58,7 @@ public class ClientMain {
 			}
 			
 			if (boardSelection != Card.Null && handSelection != Card.Null) {
+				ClientGUI.updateStatus("Le selection sent");
 				ClientSocketLayer.sendSelection(handSelection, boardSelection);
 				handSelection = boardSelection = Card.Null;
 			}
